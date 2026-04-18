@@ -1,0 +1,23 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Virtual environments (VERY IMPORTANT)
+venv/
+.venv/
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+
+# Model files (DO NOT PUSH)
+*.pth
+
+# Upload folder (runtime only)
+uploadimages/
+
+# Logs
+*.log

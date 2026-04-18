@@ -1,0 +1,77 @@
+[
+  {
+    "name": "Aphid",
+    "cause": "Infestation by aphids that suck plant sap, leading to yellowing and curling of leaves.",
+    "cure": "Use insecticidal soap or neem oil. Introduce natural predators like ladybugs."
+  },
+  {
+    "name": "Black Rust",
+    "cause": "Caused by the fungus Puccinia graminis, affecting stems and leaves.",
+    "cure": "Use resistant varieties and apply fungicides. Remove infected plant debris."
+  },
+  {
+    "name": "Blast",
+    "cause": "Caused by Magnaporthe oryzae fungus under warm and humid conditions.",
+    "cure": "Apply fungicides early and use resistant crop varieties."
+  },
+  {
+    "name": "Brown Rust",
+    "cause": "Caused by Puccinia triticina fungus, common in moderate temperatures.",
+    "cure": "Use resistant varieties and apply fungicides when needed."
+  },
+  {
+    "name": "Common Root Rot",
+    "cause": "Soil-borne fungi infect roots, often in dry conditions.",
+    "cure": "Practice crop rotation and use treated seeds."
+  },
+  {
+    "name": "Fusarium Head Blight",
+    "cause": "Caused by Fusarium fungi during wet and humid flowering conditions.",
+    "cure": "Use resistant varieties and apply fungicides during flowering."
+  },
+  {
+    "name": "Healthy",
+    "cause": "No disease present. Plant is in good condition.",
+    "cure": "Maintain proper irrigation, fertilization, and regular monitoring."
+  },
+  {
+    "name": "Leaf Blight",
+    "cause": "Caused by fungal pathogens under warm and moist conditions.",
+    "cure": "Remove infected leaves and apply appropriate fungicides."
+  },
+  {
+    "name": "Mildew",
+    "cause": "Powdery mildew fungus grows in humid conditions with poor airflow.",
+    "cure": "Improve air circulation and apply sulfur-based fungicides."
+  },
+  {
+    "name": "Mite",
+    "cause": "Infestation by mites that damage plant tissues and reduce growth.",
+    "cure": "Use miticides or neem oil and maintain field hygiene."
+  },
+  {
+    "name": "Septoria",
+    "cause": "Fungal disease causing leaf spots, thrives in wet conditions.",
+    "cure": "Apply fungicides and remove infected plant debris."
+  },
+  {
+    "name": "Smut",
+    "cause": "Fungal infection affecting grains and heads of wheat.",
+    "cure": "Use certified seeds and apply seed treatment fungicides."
+  },
+  {
+    "name": "Stem fly",
+    "cause": "Larvae bore into stems causing plant weakening and yield loss.",
+    "cure": "Use insecticides and resistant crop varieties."
+  },
+  {
+    "name": "Tan spot",
+    "cause": "Caused by Pyrenophora tritici-repentis fungus.",
+    "cure": "Practice crop rotation and apply fungicides when necessary."
+  },
+  {
+    "name": "Yellow Rust",
+    "cause": "Caused by Puccinia striiformis fungus in cool, moist climates.",
+    "cure": "Use resistant varieties and apply fungicides early."
+  }
+]

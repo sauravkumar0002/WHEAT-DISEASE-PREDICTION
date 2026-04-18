@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wheat Disease Detection System</title>
+    <link rel="icon" href="../static/images/logo.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../static/css/style.css">
+</head>
+<body>
+    <!-- ========== ANIMATED BACKGROUND SLIDESHOW ========== -->
+    <div class="bg-slider">
+        <div class="bg-slide active" style="background-image: url('../static/images/crop_background.jpg');"></div>
+        <div class="bg-slide" style="background-image: url('../static/images/crop_background1.jpg');"></div>
+        <div class="bg-slide" style="background-image: url('../static/images/crop_background2.jpg');"></div>
+        <div class="bg-slide" style="background-image: url('../static/images/crop_background3.jpg');"></div>
+        <div class="bg-slide" style="background-image: url('../static/images/crop_background4.jpg');"></div>
+        <div class="bg-slide" style="background-image: url('../static/images/crop_background5.jpg');"></div>
+        <div class="bg-overlay"></div>
+    </div>
+
+    <!-- ========== MINIMAL HEADER ========== -->
+    <header class="top-header">
+        <div class="header-container">
+            <div class="header-brand">
+                <i class="fas fa-leaf"></i>
+                <span>Wheat Disease Detection</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========== MAIN VIEWPORT CONTAINER ========== -->
+    <main class="main-viewport">
+        <div class="container-demo">
+            <!-- UPLOAD STATE: Show only when no result -->
+            {% if not result %}
+            <section class="demo-card upload-state fade-in">
+                <div class="upload-content">
+                    <h1 class="demo-title">Upload Wheat Leaf Image</h1>
+                    <p class="demo-subtitle">AI-powered disease identification</p>
+
+                    <form action="/upload/" method="POST" enctype="multipart/form-data" id="uploadForm" class="upload-form">
+                        <!-- Drag & Drop Zone -->
+                        <div class="drag-drop-zone" id="dragDropZone">
+                            <div class="drag-icon">
+                                <i class="fas fa-image"></i>
+                            </div>
+                            <h3>Drag & Drop Image Here</h3>
+                            <p class="drag-text">or <label for="imageInput" class="file-browse-link">browse files</label></p>
+                            <input type="file" id="imageInput" name="img" accept="image/png, image/jpeg" required hidden>
+                            <p class="file-hint">PNG, JPEG • Max 10MB</p>
+                        </div>
+
+                        <!-- Preview -->
+                        <div id="previewContainer" class="preview-container" style="display: none;">
+                            <div class="preview-wrapper">
+                                <img id="previewImage" src="" alt="Preview" class="preview-image">
+                                <button type="button" class="btn-remove" onclick="resetUpload()">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn-analyze">
+                            <i class="fas fa-bolt"></i> Analyze Image
+                        </button>
+                    </form>
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- RESULT STATE: Show only when result exists -->
+            {% if result %}
+            <section class="demo-card result-state fade-in">
+                <!-- INVALID PREDICTION -->
+                {% if prediction.type == "invalid" %}
+                <div class="result-invalid">
+                    <div class="alert-box alert-error">
+                        <div class="alert-icon">
+                            <i class="fas fa-exclamation-circle"></i>
+                        </div>
+                        <div class="alert-text">
+                            <h2>{{ prediction.name }}</h2>
+                            <p>{{ prediction.message }}</p>
+                            {% if prediction.suggestion %}
+                            <p class="suggestion"><strong>Tip:</strong> {{ prediction.suggestion }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <a href="/" class="btn-new-analysis">
+                        <i class="fas fa-redo-alt"></i> Try Another Image
+                    </a>
+                </div>
+
+                <!-- UNCERTAIN PREDICTION -->
+                {% elif prediction.type == "uncertain" %}
+                <div class="result-uncertain">
+                    <div class="alert-box alert-warning">
+                        <div class="alert-icon">
+                            <i class="fas fa-question-circle"></i>
+                        </div>
+                        <div class="alert-text">
+                            <h2>Low Confidence Prediction</h2>
+                            <p>{{ prediction.message }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Top-3 Predictions -->
+                    {% if prediction.top_predictions is defined %}
+                    <div class="top-predictions-section">
+                        <h3 class="predictions-title">
+                            <i class="fas fa-chart-bar"></i> Top Predictions
+                        </h3>
+                        <div class="predictions-list">
+                            {% for pred in prediction.top_predictions %}
+                            <div class="prediction-item">
+                                <div class="pred-header">
+                                    <span class="pred-label">{{ pred.label }}</span>
+                                    <span class="pred-value">{{ pred.confidence }}</span>
+                                </div>
+                                <div class="progress-wrapper">
+                                    <div class="progress-fill" style="width: {{ pred.confidence.replace('%', '') }}%;">
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <a href="/" class="btn-new-analysis">
+                        <i class="fas fa-redo-alt"></i> Analyze Another Image
+                    </a>
+                </div>
+
+                <!-- SUCCESSFUL PREDICTION: Two-column layout -->
+                {% else %}
+                <div class="result-success result-two-column">
+                    <!-- LEFT COLUMN: Image -->
+                    <div class="result-image-section">
+                        <div class="image-wrapper">
+                            <img src="{{ imagepath }}" alt="Wheat leaf" class="result-image">
+                            <div class="image-label-overlay">
+                                {{ prediction.name }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- RIGHT COLUMN: Details -->
+                    <div class="result-details-section">
+                        <!-- Disease Name & Confidence -->
+                        <div class="disease-header">
+                            <h2 class="disease-name">{{ prediction.name }}</h2>
+                            {% if prediction.confidence is defined and prediction.confidence %}
+                            {% set conf_value = prediction.confidence.replace('%', '') | int %}
+                            {% if conf_value > 80 %}
+                            <span class="confidence-badge badge-high">
+                                <i class="fas fa-check-circle"></i> {{ prediction.confidence }}
+                            </span>
+                            {% elif conf_value >= 50 %}
+                            <span class="confidence-badge badge-medium">
+                                <i class="fas fa-clock"></i> {{ prediction.confidence }}
+                            </span>
+                            {% else %}
+                            <span class="confidence-badge badge-low">
+                                <i class="fas fa-info-circle"></i> {{ prediction.confidence }}
+                            </span>
+                            {% endif %}
+                            {% endif %}
+                        </div>
+
+                        <!-- Cause Section -->
+                        <div class="info-block cause-block">
+                            <div class="block-icon">
+                                <i class="fas fa-microscope"></i>
+                            </div>
+                            <div class="block-content">
+                                <h4>Disease Cause</h4>
+                                <p>{{ prediction.cause }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Cure Section -->
+                        <div class="info-block cure-block">
+                            <div class="block-icon">
+                                <i class="fas fa-leaf"></i>
+                            </div>
+                            <div class="block-content">
+                                <h4>Treatment</h4>
+                                <p>{{ prediction.cure }}</p>
+                            </div>
+                        </div>
+
+                        <!-- Top Predictions (if exists) -->
+                        {% if prediction.top_predictions is defined %}
+                        <div class="compact-predictions">
+                            <h4 class="predictions-label">
+                                <i class="fas fa-chart-pie"></i> Other Possibilities
+                            </h4>
+                            <div class="mini-predictions-list">
+                                {% for pred in prediction.top_predictions[:2] %}
+                                <div class="mini-pred-item">
+                                    <span>{{ pred.label }}</span>
+                                    <span class="mini-pred-conf">{{ pred.confidence }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <!-- Action Button -->
+                        <a href="/" class="btn-new-analysis">
+                            <i class="fas fa-redo-alt"></i> Analyze Another Image
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </section>
+            {% endif %}
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="../static/js/bootstrap.bundle.min.js"></script>
+    <script src="../static/js/upload.js"></script>
+    <script>
+        // ========== BACKGROUND SLIDESHOW ========== 
+        document.addEventListener('DOMContentLoaded', function() {
+            const slides = document.querySelectorAll('.bg-slide');
+            let currentSlide = 0;
+
+            console.log('=== BACKGROUND SLIDESHOW DEBUG ===');
+            console.log('Total slides found:', slides.length);
+
+            // Display slide info
+            slides.forEach((slide, index) => {
+                const bgImage = window.getComputedStyle(slide).backgroundImage;
+                console.log(`Slide ${index}:`, bgImage);
+            });
+
+            if (slides.length === 0) {
+                console.error('ERROR: No .bg-slide elements found!');
+                return;
+            }
+
+            // Function to show next slide
+            function showNextSlide() {
+                // Remove active from current slide
+                slides[currentSlide].classList.remove('active');
+                
+                // Move to next slide
+                currentSlide = (currentSlide + 1) % slides.length;
+                
+                // Add active to new slide
+                slides[currentSlide].classList.add('active');
+                
+                console.log(`Showing slide: ${currentSlide}`);
+            }
+
+            // Start with first slide
+            slides[0].classList.add('active');
+            console.log('Initial slide set to: 0');
+
+            // Change slide every 4.5 seconds
+            setInterval(showNextSlide, 4500);
+            console.log('Slideshow interval started: 4.5s');
+        });
+
+        // ========== ENHANCED DRAG-DROP =========
+        const dragDropZone = document.getElementById('dragDropZone');
+        const imageInput = document.getElementById('imageInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImage = document.getElementById('previewImage');
+
+        if (dragDropZone) {
+            dragDropZone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dragDropZone.classList.add('drag-active');
+            });
+
+            dragDropZone.addEventListener('dragleave', () => {
+                dragDropZone.classList.remove('drag-active');
+            });
+
+            dragDropZone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dragDropZone.classList.remove('drag-active');
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    imageInput.files = files;
+                    showPreview(files[0]);
+                }
+            });
+
+            imageInput.addEventListener('change', (e) => {
+                if (e.target.files.length > 0) {
+                    showPreview(e.target.files[0]);
+                }
+            });
+        }
+
+        function showPreview(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+                dragDropZone.style.display = 'none';
+                previewContainer.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetUpload() {
+            imageInput.value = '';
+            previewContainer.style.display = 'none';
+            dragDropZone.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
