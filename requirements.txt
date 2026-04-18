@@ -1,6 +1,5 @@
-flask
+streamlit
 torch
 torchvision
 pillow
 gdown
-gunicorn
